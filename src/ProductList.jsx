@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './ProductList.css'
 import CartItem from './CartItem';
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { addItem } from "./CartSlice";
 
 function ProductList({ onHomeClick }) {
@@ -10,7 +10,7 @@ function ProductList({ onHomeClick }) {
     const [addedToCart, setAddedToCart] = useState({});
     const dispatch = useDispatch();
     // Retrieve the cart state from Redux
-    const cart = useSelector((state) => state.cart.items); // Assuming your Redux store has a 'cart' slice
+    const cartItems = useSelector((state) => state.cart.items); // Assuming your Redux store has a 'cart' slice
 
     const plantsArray = [
         {
