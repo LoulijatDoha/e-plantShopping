@@ -17,12 +17,12 @@ export const CartSlice = createSlice({
       }
     },
 
-    // ✅ Supprime un produit par son nom
+    // Supprime un produit par son nom
     removeItem: (state, action) => {
       state.items = state.items.filter(item => item.name !== action.payload);
     },
 
-    // ✅ Met à jour la quantité d’un produit existant
+    //  Met à jour la quantité d’un produit existant
     updateQuantity: (state, action) => {
       const { name, quantity } = action.payload;
       const item = state.items.find(item => item.name === name);
