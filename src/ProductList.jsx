@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import './ProductList.css'
+import React, { useState } from 'react'; // Removed useEffect as it wasn't used
+import './ProductList.css';
 import CartItem from './CartItem';
 import { useSelector, useDispatch } from "react-redux";
 import { addItem } from "./CartSlice";
 
+// Renamed parameter to 'plant' for clarity within the map function later
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
-    const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
-    const [addedToCart, setAddedToCart] = useState({});
+    // Initialize showPlants to true so the list appears initially
+    const [showPlants, setShowPlants] = useState(true);
+    // Removed unused addedToCart state: const [addedToCart, setAddedToCart] = useState({});
     const dispatch = useDispatch();
-    // Retrieve the cart state from Redux
-    const cartItems = useSelector((state) => state.cart.items); // Assuming your Redux store has a 'cart' slice
+    // Retrieve the cart state from Redux, renamed to 'cart' for clarity
+    const cart = useSelector((state) => state.cart.items);
 
     const plantsArray = [
         {
@@ -219,107 +221,139 @@ function ProductList({ onHomeClick }) {
             ]
         }
     ];
+
+    // --- Styles --- (Keep your existing style objects)
     const styleObj = {
         backgroundColor: '#4CAF50',
         color: '#fff!important',
         padding: '15px',
         display: 'flex',
         justifyContent: 'space-between',
-        alignIems: 'center',
+        alignItems: 'center', // Corrected typo: alignIems -> alignItems
         fontSize: '20px',
-    }
+    };
     const styleObjUl = {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        width: '1100px',
-    }
+        width: '1100px', // Consider using relative units for responsiveness if needed
+    };
     const styleA = {
         color: 'white',
         fontSize: '30px',
         textDecoration: 'none',
-    }
+    };
 
+    // --- Event Handlers ---
     const handleHomeClick = (e) => {
         e.preventDefault();
-        onHomeClick();
+        setShowPlants(true); // Show plants list
+        setShowCart(false);  // Hide cart
+        // Call the original prop if it exists
+        if (onHomeClick) {
+            onHomeClick();
+        }
     };
 
     const handleCartClick = (e) => {
         e.preventDefault();
-        setShowCart(true); // Set showCart to true when cart icon is clicked
+        setShowCart(true);   // Show cart
+        setShowPlants(false); // Hide plants list
     };
+
     const handlePlantsClick = (e) => {
         e.preventDefault();
-        setShowPlants(true); // Set showAboutUs to true when "About Us" link is clicked
-        setShowCart(false); // Hide the cart when navigating to About Us
+        setShowPlants(true); // Show plants list
+        setShowCart(false);  // Hide cart
     };
 
     const handleContinueShopping = (e) => {
         e.preventDefault();
-        setShowCart(false);
+        setShowCart(false);  // Hide cart
+        setShowPlants(true); // Show plants list
     };
 
-    const handleAddToCart = (product) => {
-        // 1. Envoyer les détails du plant au niveau global (Redux)
-        dispatch(addItem(product));
-
-        // 2. Réfléter localement que ce produit a été ajouté
-        setAddedToCart((prevState) => ({
-        ...prevState,
-        [product.name]: true,
-        }));
+    const handleAddToCart = (plant) => { // Changed parameter name to 'plant'
+        // Dispatch action to add item to Redux store
+        dispatch(addItem(plant));
+        // Removed setAddedToCart call as the state was unused
     };
 
-    // Calculate the quantity of each item in the cart
-    const cartQuantities = cartItems.reduce((acc, item) => {
-        acc[item.name] = (acc[item.name] || 0) + 1;
-        return acc;
-    }, {});
-
-    console.log(cartQuantities);
+    // --- Removed Redundant Calculation ---
+    // The cart state from Redux already has quantities managed by the reducer
+    // const cartQuantities = cart.reduce(...) // This whole block was removed
 
     return (
         <div>
+            {/* --- Navbar --- */}
             <div className="navbar" style={styleObj}>
                 <div className="tag">
-                    <div className="luxury">
-                        <img src="https://cdn.pixabay.com/photo/2020/08/05/13/12/eco-5465432_1280.png" alt="" />
-                        <a href="/" onClick={(e) => handleHomeClick(e)}>
+                    <div className="luxury" style={{ display: 'flex', alignItems: 'center' }}> {/* Added basic flex style for alignment */}
+                        <img src="https://cdn.pixabay.com/photo/2020/08/05/13/12/eco-5465432_1280.png" alt="" style={{ marginRight: '10px', height: '50px' }} /> {/* Added basic img style */}
+                        {/* Make sure the anchor tag wraps the clickable area */}
+                        <a href="/" onClick={handleHomeClick} style={{ textDecoration: 'none' }}>
                             <div>
-                                <h3 style={{ color: 'white' }}>Paradise Nursery</h3>
-                                <i style={{ color: 'white' }}>Where Green Meets Serenity</i>
+                                <h3 style={{ color: 'white', margin: '0' }}>Paradise Nursery</h3>
+                                <i style={{ color: 'white', fontSize: '0.9em' }}>Where Green Meets Serenity</i> {/* Adjusted font size slightly */}
                             </div>
                         </a>
                     </div>
-
                 </div>
                 <div style={styleObjUl}>
-                    <div> <a href="#" onClick={(e) => handlePlantsClick(e)} style={styleA}>Plants</a></div>
-                    <div> <a href="#" onClick={(e) => handleCartClick(e)} style={styleA}><h1 className='cart'><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68"><rect width="156" height="156" fill="none"></rect><circle cx="80" cy="216" r="12"></circle><circle cx="184" cy="216" r="12"></circle><path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" id="mainIconPathAttribute"></path></svg></h1></a></div>
+                    {/* Use anchor tags for navigation links */}
+                    <a href="#" onClick={handlePlantsClick} style={styleA}>Plants</a>
+                    <a href="#" onClick={handleCartClick} style={styleA}>
+                        <h1 className='cart' style={{ margin: 0, display: 'flex', alignItems: 'center' }}> {/* Added basic style to h1 */}
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" id="IconChangeColor" height="68" width="68">
+                                <rect width="256" height="256" fill="none"></rect> {/* Use full viewbox size for rect */}
+                                <circle cx="80" cy="216" r="12"></circle>
+                                <circle cx="184" cy="216" r="12"></circle>
+                                {/* Adjusted stroke-width and linecap/linejoin casing */}
+                                <path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" strokeLinecap="round" strokeLinejoin="round" strokeWidth="12"></path>
+                            </svg>
+                            {/* Optional: Display cart item count */}
+                            {cart.length > 0 && (
+                                <span className="cart-count" style={{ fontSize: '16px', marginLeft: '5px', backgroundColor: 'red', borderRadius: '50%', padding: '2px 6px', color: 'white' }}>
+                                    {/* Calculate total quantity */}
+                                    {cart.reduce((total, item) => total + item.quantity, 0)}
+                                </span>
+                            )}
+                        </h1>
+                    </a>
                 </div>
             </div>
-            {plantsArray.map((category, index) => (
-                <div key={index} className = "product-grid">
-                    <h1><div>{category.category}</div></h1>
-                    <div className="product-list">
-                        {category.plants.map((plant, plantIndex) => (
-                        <div className="product-card" key={plantIndex}>
-                            <img className="product-image" src={plant.image} alt={plant.name} />
-                            <div className="product-title">{plant.name}</div>
-                            {/*Similarly like the above plant.name show other details like description and cost*/}
-                            <button  className="product-button" onClick={() => handleAddToCart(plant)}>Add to Cart</button>
+
+            {/* --- Conditional Rendering: Plant List --- */}
+            {/* Show plants only if showPlants is true AND showCart is false */}
+            {showPlants && !showCart && (
+                <div> {/* Outer container for all categories */}
+                    {plantsArray.map((category, index) => (
+                        // Use a more descriptive class if available in your CSS, otherwise 'product-grid' is fine
+                        <div key={index} className="product-grid">
+                            <h1><div>{category.category}</div></h1>
+                            <div className="product-list">
+                                {category.plants.map((plant, plantIndex) => (
+                                    // Using plant.name + index for a potentially more unique key
+                                    <div className="product-card" key={plant.name + plantIndex}>
+                                        <img className="product-image" src={plant.image} alt={plant.name} />
+                                        <div className="product-title">{plant.name}</div>
+                                        {/* Added divs for description and cost */}
+                                        <div className="product-description" style={{fontSize: '0.9em', margin: '5px 0'}}>{plant.description}</div>
+                                        <div className="product-cost" style={{fontWeight: 'bold', margin: '5px 0'}}>{plant.cost}</div>
+                                        <button className="product-button" onClick={() => handleAddToCart(plant)}>
+                                            Add to Cart
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        ))}
-                    </div>
+                    ))}
                 </div>
-            ))}
-            {!showCart ? (
-                <div className="product-grid">
+            )}
 
-
-                </div>
-            ) : (
+            {/* --- Conditional Rendering: Cart --- */}
+            {/* Show CartItem only if showCart is true */}
+            {showCart && (
                 <CartItem onContinueShopping={handleContinueShopping} />
             )}
         </div>
